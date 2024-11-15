@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { FontAwesome } from "react-native-vector-icons";
+import SelectDropdown from 'react-native-select-dropdown';
 import { useState } from 'react';
 
 export default function App() {
