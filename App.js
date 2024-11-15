@@ -1,64 +1,102 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput,Button } from 'react-native';
 import { FontAwesome } from "react-native-vector-icons";
 import SelectDropdown from 'react-native-select-dropdown';
 import { useState } from 'react';
 
-export default function App() {
+import { Formik } from "formik";
+import * as yup from 'yup';
+
+// Definición del esquema de validación con Yup
+const schema = yup.object().shape({
+  username: yup.string().required('Nombre de usuario es requerido'),
+  email: yup.string().email('Email no válido').required('Email es requerido'),
+  password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('Contraseña es requerida'),
+});
+
+// Componente del formulario
+export default function App(){
     const [hidePassword,setHidePassword] = useState(true);
-
   return (
-    <View style={styles.container}>
-        <View style={styles.formContainer}>
+  <Formik
+        initialValues={{ username: '', email: '', password: '' }}
+        validationSchema={schema}
+        onSubmit={(values) => {
+          console.log(values);
+        }}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+            <View style={styles.container}>
+                <View style={styles.formContainer}>
 
-            <View style={styles.header}>
-                <Text style={styles.subtitle}>Workaway Couple Membership</Text>
-                <Text style={styles.title}>Create your account</Text>
-            </View>
+                    <View style={styles.header}>
+                        <Text style={styles.subtitle}>Workaway Couple Membership</Text>
+                        <Text style={styles.title}>Create your account</Text>
+                    </View>
 
-            <View style={styles.formFields}>
-                <Text style={styles.formLabel}>Username</Text>
-                <TextInput style={styles.FormInput} placeholder="Introduce tu nombre"/>
+                    <View style={styles.formFields}>
 
-                <Text style={styles.formLabel}>Email</Text>
-                <TextInput style={styles.FormInput} placeholder="Introduce tu correo"/>
+                        <Text style={styles.formLabel}>Username</Text>
+                        <TextInput
+                            style={styles.FormInput}
+                            onChangeText={handleChange('username')}
+                            onBlur={handleBlur('username')}
+                            value={values.username}
+                            placeholder="Nombre de usuario"
+                        />
+                        {errors.username && <Text style={styles.error}>{errors.username}</Text>}
 
-                <Text style={styles.formLabel}>Password</Text>
-                <View style={styles.passwordLabel}>
-                    <TextInput
-                        style={[styles.FormInput,{width:'78%',borderTopLeftRadius: 8,borderBottomLeftRadius: 8,borderTopRightRadius: 0,borderBottomRightRadius: 0,}]}
-                        placeholder="Introduce tu correo"
-                        secureTextEntry={hidePassword}  // Esto oculta el texto (como una contraseña)
+                        <Text style={styles.formLabel}>Email</Text>
+                        <TextInput
+                            style={styles.FormInput}
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                            placeholder="Email"
+                        />
+                        {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
-                    />
-                    <TouchableOpacity style={styles.showPassword}>
-                        <FontAwesome onPress={()=>{setHidePassword(!hidePassword)}} name={hidePassword?"eye":"eye-slash"} color="#000" size={20} />
-                    </TouchableOpacity>
+                        <Text style={styles.formLabel}>Password</Text>
+                        <View style={styles.passwordLabel}>
+                            <TextInput
+                                style={[styles.FormInput,{width:'78%',borderTopLeftRadius: 8,borderBottomLeftRadius: 8,borderTopRightRadius: 0,borderBottomRightRadius: 0,}]}
+                                onChangeText={handleChange('password')}
+                                onBlur={handleBlur('password')}
+                                value={values.password}
+                                placeholder="Contraseña"
+                                secureTextEntry
+                            />
+                            <TouchableOpacity style={styles.showPassword}>
+                                <FontAwesome onPress={()=>{setHidePassword(!hidePassword)}} name={hidePassword?"eye":"eye-slash"} color="#000" size={20} />
+                            </TouchableOpacity>
+                        </View>
+                        {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+
+
+                        <Text style={styles.formLabel}>Date of birth</Text>
+
+
+                        <Text style={styles.formLabel}>Country of residence</Text>
+
+
+                        <Text style={styles.formLabel}>I have read, understood and agree to the workaway.info terms and conditions and privacy policy</Text>
+
+
+                        <Text style={styles.formLabel}>I would like to receive email updates from Workaway</Text>
+
+
+                        <TouchableOpacity style={styles.confirm} onPress={handleSubmit} >
+                            <Text style={{textAlign:'center',fontWeight:800}}>Continue</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-
-                <Text style={styles.formLabel}>Date of birth</Text>
-
-
-                <Text style={styles.formLabel}>Country of residence</Text>
-
-
-                <Text style={styles.formLabel}>I have read, understood and agree to the workaway.info terms and conditions and privacy policy</Text>
-
-
-                <Text style={styles.formLabel}>I would like to receive email updates from Workaway</Text>
-
-
-                <TouchableOpacity style={styles.confirm}>
-                    <Text style={{textAlign:'center',fontWeight:800}}>Continue</Text>
-                </TouchableOpacity>
             </View>
-        </View>
-
-        <StatusBar style="auto" />
-    </View>
+        )}
+      </Formik>
   );
 }
 
+// Estilos del formulario
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -69,7 +107,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: '#fff',
     width:'90%',
-    height:'70%',
+    height:'85%',
     padding:5,
   },
   header: {
@@ -117,5 +155,8 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     padding:10,
   },
-
+  error: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });
